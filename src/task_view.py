@@ -31,12 +31,14 @@ class DrawUtils:
         self.model.set_urgency(urgency)
 
     def input_date(self):
-        date = inquirer.text(message='Enter starting date\n Example 2023.01.01\n',
-                             validate=lambda result: re.search("^\d{4}[.]\d{2}[.]\d{2}$", result)).execute()
+        date = inquirer.text(
+            message='Enter starting date\n Example 2023.01.01\n',
+            validate=lambda result: re.search("^\d{4}[.]\d{2}[.]\d{2}$", result)
+            ).execute()
         self.model.set_date(date)
 
     def input_finish_date(self):
-        finish_date =  inquirer.text(
+        finish_date = inquirer.text(
             message='Enter finishing date\n Example 2023.01.01\n',
             validate=lambda result: re.search("^\d{4}[.]\d{2}[.]\d{2}$", result)
             ).execute()
