@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 import task_model
 
@@ -10,7 +11,8 @@ class Orm:
         self.init_db()
 
     def create_connection(self):
-        self.conn = sqlite3.connect('../todo.db')
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        self.conn = sqlite3.connect(dir_path + '/../todo.db')
         self.cur = self.conn.cursor()
 
     def close_connection(self):
