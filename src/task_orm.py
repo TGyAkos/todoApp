@@ -37,10 +37,10 @@ class Orm:
                         date,
                         finish_date
                         ) VALUES (?,?,?,?)''', (
-                            task_model.name, 
-                            task_model.urgency, 
-                            task_model.date, 
-                            task_model.finish_date
+                            task_model.get_name(), 
+                            task_model.get_urgency(),  
+                            task_model.get_date(),  
+                            task_model.get_finish_date()
                         ))
         self.conn.commit()
         self.close_connection()
