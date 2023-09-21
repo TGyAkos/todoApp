@@ -21,7 +21,7 @@ class Orm:
         self.res = self.cur.execute('''CREATE TABLE IF NOT EXISTS todo (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT, 
                                     name TEXT, 
-                                    urgency INTEGER,
+                                    urgency TEXT,
                                     date TEXT, 
                                     finish_date TEXT
                                     )''')
