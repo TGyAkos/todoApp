@@ -27,20 +27,21 @@ class DrawUtils:
         self.model.set_name(name)
 
     def input_urgency(self):
-        urgency = inquirer.select(message='Select urgency', choices= ["low", "medium", "high"]).execute()
+        urgency = inquirer.select(message='Select urgency', choices=["low", "medium", "high"]).execute()
         self.model.set_urgency(urgency)
 
     def input_date(self):
         date = inquirer.text(
             message='Enter starting date\n Example 2023.01.01\n',
-            validate=lambda result: re.search("^\d{4}[.]\d{2}[.]\d{2}$", result)
+            validate=lambda result: self.validate_date(result)
             ).execute()
         self.model.set_date(date)
 
     def input_finish_date(self):
+        # FIXME repeating logic here
         finish_date = inquirer.text(
             message='Enter finishing date\n Example 2023.01.01\n',
-            validate=lambda result: re.search("^\d{4}[.]\d{2}[.]\d{2}$", result)
+            validate=lambda result: self.validate_date(result)
             ).execute()
         self.model.set_finish_date(finish_date)
 
@@ -55,10 +56,38 @@ class DrawUtils:
         self.controller.delete_task(task_id)
         pprint("Task deleted successfully")
 
+    # TODO redo it, looks awful
     def list_tasks(self):
         pprint("All tasks saved:")
         pprint(self.controller.get_all_tasks())
 
+    def list_tasks_by_due_date(self):
+        query_model = self.controller.create_new_query_model()
+
+        # TODO implement this long fucking function
+        # all_finish_dates = self.controller.get_all_saved_finish_dates_for_auto_completeion()
+        finish_date = inquirer.text(
+            message='Enter task due date\n Example 2023.01.01\n',
+            # FIXME hacky way of doing this
+            validate=lambda result: self.validate_date(result),
+            #completer=all_finish_dates
+        ).execute()
+        query_model.set_finish_date(finish_date)
+
+        urgency = inquirer.select(
+            message='Select urgency\n To select multiple press space', 
+            # FIXME this should be a class variable
+            choices=["low", "medium", "high", "all"],
+            default="all",
+            multiselect=True,
+        ).execute()
+        query_model.set_urgency(urgency)
+
+        pprint(self.controller.get_task_by_query_model(query_model))
+
+    # BUG this will let through non existent dates such as: 8888.99.99
+    def validate_date(self, date):
+        return re.search("^\d{4}[.]\d{2}[.]\d{2}$", date)
 
 class DrawUI:
     """Dependencies:
@@ -76,7 +105,8 @@ class DrawUI:
             self.action = inquirer.select(
                 message='What do you want to do?', 
                 choices=["Add new task", 
-                        "List all tasks", 
+                        "List all tasks",
+                        "List tasks by due date",
                         "Delete task", 
                         "Exit"]).execute()
             
@@ -85,6 +115,8 @@ class DrawUI:
                     self.utils.add_new_task()
                 case "List all tasks":
                     self.utils.list_tasks()
+                case "List tasks by due date":
+                    self.utils.list_tasks_by_due_date()
                 case "Delete task":
                     self.utils.delete_task()
                 case "Exit":

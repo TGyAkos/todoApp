@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-import task_model
+import task_model, task_query_model
 
 class Orm:
     cur = None
@@ -24,7 +24,7 @@ class Orm:
                                     id INTEGER PRIMARY KEY AUTOINCREMENT, 
                                     name TEXT, 
                                     urgency TEXT,
-                                    date TEXT, 
+                                    date DATETIME, 
                                     finish_date TEXT
                                     )''')
         self.res.fetchone()
@@ -72,6 +72,18 @@ class Orm:
         self.create_connection()
         self.cur.execute('''SELECT * FROM todo WHERE finish_date =?''', (time,))
         data = self.cur.fetchone()
+        self.close_connection()
+        return data
+    
+    def get_task_by_query_model(self, query_model: task_query_model.TaskQueryModel):
+        self.create_connection()
+        # NOTE the .format makes the ? dynamically by the lenght of the list like so: (?, ?, ?) 
+        self.cur.execute('''SELECT * FROM todo WHERE finish_date =? AND urgency IN ({})'''
+                         .format(', '.join(['?'] * len(query_model.get_urgency()))),(
+                             query_model.get_finish_date(),
+                             *query_model.get_urgency(),
+                        ))
+        data = self.cur.fetchall()
         self.close_connection()
         return data
     
